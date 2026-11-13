@@ -1,7 +1,6 @@
 /* Service Worker — Focus Quiz (يعمل دون اتصال بعد أول زيارة) */
-const VERSION = 'focus-quiz-v3';
-const SHELL = ['./', 'index.html', 'css/style.css', 'js/data.js', 'js/backend.js', 'js/app.js', 'manifest.webmanifest',
-  'assets/wordmark.png', 'assets/icon-192.png', 'assets/icon-512.png'];
+const VERSION = 'focus-quiz-flat-v1';
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
