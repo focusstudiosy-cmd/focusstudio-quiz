@@ -1,0 +1,18 @@
+{
+  "name": "Focus Studio — اختبار أساسيات التصوير",
+  "short_name": "Focus Quiz",
+  "description": "اختبار تفاعلي لأساسيات التصوير الفوتوغرافي من Focus Studio Marketing Agency",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090d",
+  "theme_color": "#09090d",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // الأدمن = حساب Firebase Authentication بهذا البريد فقط
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email == 'manarfocus@focusquiz.app';
+    }
+    function okStr(v, n) { return v is string && v.size() <= n; }
+
+    // الأسئلة: يقرؤها الجميع، ويعدّلها الأدمن فقط
+    match /questions/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // taken: وثيقة تُنشأ مرة واحدة عند بدء الاختبار (تمنع الإعادة من أي جهاز)
+    match /taken/{id} {
+      allow get: if true;                 // للتحقق هل اختبر من قبل (بمعرّف يعرفه صاحبه فقط)
+      allow list: if isAdmin();
+      allow create: if isAdmin() || (
+        id.size() < 40
+        && request.resource.data.keys().hasOnly(['name', 'place', 'teacher', 'at'])
+        && okStr(request.resource.data.name, 80)
+        && okStr(request.resource.data.place, 80)
+        && okStr(request.resource.data.teacher, 80)
+        && request.resource.data.at is number
+      );
+      allow update, delete: if isAdmin(); // لا يستطيع الطالب تعديلها أو حذفها
+    }
+
+    // results: الطالب يُنشئ نتيجته مرة واحدة فقط ولا يستطيع قراءة نتائج الآخرين
+    match /results/{id} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create: if isAdmin() || (
+        id.size() < 40
+        && exists(/databases/$(database)/documents/taken/$(id))
+        && request.resource.data.keys().hasOnly(
+             ['key', 'name', 'phone', 'place', 'teacher', 'correct', 'total', 'percent', 'grade', 'at', 'details'])
+        && request.resource.data.percent is number
+        && request.resource.data.percent >= 0 && request.resource.data.percent <= 100
+        && request.resource.data.correct is int && request.resource.data.total is int
+        && request.resource.data.correct <= request.resource.data.total
+        && okStr(request.resource.data.name, 80)
+        && okStr(request.resource.data.phone, 30)
+        && okStr(request.resource.data.place, 80)
+        && okStr(request.resource.data.teacher, 80)
+        && okStr(request.resource.data.key, 200)
+        && okStr(request.resource.data.grade, 20)
+        && request.resource.data.details is list
+        && request.resource.data.details.size() <= 200
+      );
+      allow update, delete: if isAdmin();
+    }
+  }
+}
